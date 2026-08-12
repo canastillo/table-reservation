@@ -19,3 +19,12 @@ spring:
       com.restaurant.reservation.controller.AdminController: INFO
   web:
     locale: en
+
+# SpringDoc
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method # order by http methods
+    tagsSorter: alpha # order alphabetically
