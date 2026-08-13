@@ -12,14 +12,14 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class AdminControllerTest {
+class TableControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -28,6 +28,8 @@ class AdminControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    private final String tablesURI = "/api/admin/tables";
+
     @Test
     void initializeTables_successful() throws Exception {
         TableInitializationRequest request = new TableInitializationRequest();
@@ -35,7 +37,7 @@ class AdminControllerTest {
         request.setLarge(3);
         request.setSmall(1);
 
-        mockMvc.perform(post("/api/admin/tables/initialize")
+        mockMvc.perform(post(tablesURI + "/initialize")
                         .contentType(String.valueOf(MediaType.APPLICATION_JSON))
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -60,7 +62,7 @@ class AdminControllerTest {
     void initializeTables_emptyRequestShouldInitializeWithZero() throws Exception {
         TableInitializationRequest request = new TableInitializationRequest();
 
-        mockMvc.perform(post("/api/admin/tables/initialize")
+        mockMvc.perform(post(tablesURI + "/initialize")
                         .contentType(String.valueOf(MediaType.APPLICATION_JSON))
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -73,13 +75,13 @@ class AdminControllerTest {
     }
 
     @Test
-    void shouldReturnBadRequestWhenNegativeValue() throws Exception {
+    void initializeTables_shouldReturnBadRequestWhenNegativeValue() throws Exception {
         String invalidJson = """
             {
                 "fixed": -1
             }""";
 
-        mockMvc.perform(post("/api/admin/tables/initialize")
+        mockMvc.perform(post(tablesURI + "/initialize")
                         .contentType(String.valueOf(MediaType.APPLICATION_JSON))
                         .content(invalidJson))
                 .andExpect(status().isBadRequest())
@@ -88,13 +90,13 @@ class AdminControllerTest {
     }
 
     @Test
-    void shouldReplaceExistingTables() throws Exception {
+    void initializeTables_shouldReplaceExistingTables() throws Exception {
         // First configuration: 2 fixed, 1 large
         TableInitializationRequest first = new TableInitializationRequest();
         first.setFixed(2);
         first.setLarge(1);
 
-        mockMvc.perform(post("/api/admin/tables/initialize")
+        mockMvc.perform(post(tablesURI + "/initialize")
                 .contentType(String.valueOf(MediaType.APPLICATION_JSON))
                 .content(objectMapper.writeValueAsString(first)));
 
@@ -103,7 +105,7 @@ class AdminControllerTest {
         second.setFixed(1);
         second.setSmall(2);
 
-        mockMvc.perform(post("/api/admin/tables/initialize")
+        mockMvc.perform(post(tablesURI + "/initialize")
                 .contentType(String.valueOf(MediaType.APPLICATION_JSON))
                 .content(objectMapper.writeValueAsString(second)));
 
@@ -113,5 +115,43 @@ class AdminControllerTest {
         assertThat(tableRepository.findByNumber("S2")).isPresent();
         assertThat(tableRepository.findByNumber("S3")).isPresent();
         assertThat(tableRepository.findByNumber("L1")).isNotPresent();
+    }
+
+    @Test
+    void getRestaurantTables_shouldReturnTableCountsAfterInitialization() throws Exception {
+        // Inicializar 2 fijas, 1 grande, 3 pequeñas
+        TableInitializationRequest request = new TableInitializationRequest();
+        request.setFixed(2);
+        request.setLarge(1);
+        request.setSmall(3);
+        mockMvc.perform(post(tablesURI + "/initialize")
+                .contentType(String.valueOf(MediaType.APPLICATION_JSON))
+                .content(objectMapper.writeValueAsString(request)));
+
+        mockMvc.perform(get(tablesURI))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(String.valueOf(MediaType.APPLICATION_JSON)))
+                .andExpect(jsonPath("$.FIXED").value(2))
+                .andExpect(jsonPath("$.LARGE").value(1))
+                .andExpect(jsonPath("$.SMALL").value(3));
+    }
+
+    @Test
+    void getRestaurantTables_shouldReturnZeroCountsWhenNoTables() throws Exception {
+        // Inicializar con cero mesas (o simplemente no inicializar y asumir que está vacío)
+        TableInitializationRequest request = new TableInitializationRequest();
+        request.setFixed(0);
+        request.setLarge(0);
+        request.setSmall(0);
+        mockMvc.perform(post(tablesURI + "/initialize")
+                .contentType(String.valueOf(MediaType.APPLICATION_JSON))
+                .content(objectMapper.writeValueAsString(request)));
+
+        mockMvc.perform(get(tablesURI))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(String.valueOf(MediaType.APPLICATION_JSON)))
+                .andExpect(jsonPath("$.FIXED").value(0))
+                .andExpect(jsonPath("$.LARGE").value(0))
+                .andExpect(jsonPath("$.SMALL").value(0));
     }
 }

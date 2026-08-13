@@ -1,5 +1,6 @@
 package com.restaurant.reservation.service;
 
+import com.restaurant.reservation.domain.enums.TableType;
 import com.restaurant.reservation.domain.models.RestaurantTable;
 import com.restaurant.reservation.dto.TableInitializationRequest;
 import com.restaurant.reservation.exception.BusinessException;
@@ -11,7 +12,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -87,5 +90,37 @@ class TableServiceTest {
 
         verify(tableRepository, never()).deleteAllInBatch();
         verify(tableRepository, never()).saveAll(any());
+    }
+
+    @Test
+    void getAllTables_shouldCountTablesByType() {
+        // Preparar datos mock
+        RestaurantTable fixed1 = RestaurantTable.builder()
+                .number("F1").type(TableType.FIXED).build();
+        RestaurantTable fixed2 = RestaurantTable.builder()
+                .number("F2").type(TableType.FIXED).build();
+        RestaurantTable large1 = RestaurantTable.builder()
+                .number("L1").type(TableType.LARGE).build();
+        RestaurantTable small1 = RestaurantTable.builder()
+                .number("S1").type(TableType.SMALL).build();
+
+        when(tableRepository.findAll()).thenReturn(List.of(fixed1, fixed2, large1, small1));
+
+        Map<TableType, Integer> result = tableService.getAllTables();
+
+        assertThat(result.get(TableType.FIXED)).isEqualTo(2);
+        assertThat(result.get(TableType.LARGE)).isEqualTo(1);
+        assertThat(result.get(TableType.SMALL)).isEqualTo(1);
+    }
+
+    @Test
+    void getAllTables_shouldReturnZeroCountsWhenNoTablesExist() {
+        when(tableRepository.findAll()).thenReturn(Collections.emptyList());
+
+        Map<TableType, Integer> result = tableService.getAllTables();
+
+        assertThat(result.get(TableType.FIXED)).isZero();
+        assertThat(result.get(TableType.LARGE)).isZero();
+        assertThat(result.get(TableType.SMALL)).isZero();
     }
 }

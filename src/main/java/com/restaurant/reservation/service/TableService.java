@@ -6,6 +6,7 @@ import com.restaurant.reservation.dto.TableInitializationRequest;
 import com.restaurant.reservation.exception.BusinessException;
 import com.restaurant.reservation.repository.TableRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TableService {
     private final TableRepository tableRepository;
 
@@ -55,5 +57,26 @@ public class TableService {
         if (!newTables.isEmpty()) {
             tableRepository.saveAll(newTables);
         }
+    }
+
+    public Map<TableType, Integer> getAllTables() {
+        log.debug("Fetching current configuration of tables from database");
+
+        List<RestaurantTable> allTables = tableRepository.findAll();
+        Map<TableType, Integer> tablesByType = new HashMap<>();
+
+        // Even if total of tables equals 0, api response should
+        // still include table types
+        for (TableType type : TableType.values()) {
+            tablesByType.put(type, 0);
+        }
+
+        allTables.forEach(table ->
+                tablesByType.merge(table.getType(), 1, Integer::sum)
+        );
+
+        log.debug("Fetched {} tables from database", allTables.size());
+
+        return tablesByType;
     }
 }

@@ -27,8 +27,7 @@ import java.util.Map;
 public class TableController {
     private final TableService tableService;
 
-    @Operation(summary = "Initialize tables",
-            description = "Deletes existing tables and inserts new ones based on the indicated amounts.")
+    @Operation(summary = "Initialize tables", description = "Deletes existing tables and inserts new ones based on the indicated amounts.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Tables configured successfully",
                     content = @Content(schema = @Schema(implementation = MessageResponse.class))),
@@ -40,5 +39,24 @@ public class TableController {
         log.info("Received POST request for tables.");
         tableService.initializeTables(request);
         return ResponseEntity.ok(new MessageResponse("Tables configured successfully."));
+    }
+
+    @Operation(summary = "Fetch existing tables", description = "Returns the current configuration of tables by type")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Tables fetched successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    type = "object",
+                                    description = "Map with TableType enum as key and amount as value",
+                                    implementation = MessageResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
+    @GetMapping()
+    public ResponseEntity<Map<TableType, Integer>> getRestaurantTables() {
+        log.info("Received GET request for tables.");
+        Map<TableType, Integer> allTables = tableService.getAllTables();
+        return ResponseEntity.ok(allTables);
     }
 }
