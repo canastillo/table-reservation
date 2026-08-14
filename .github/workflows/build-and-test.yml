@@ -38,6 +38,4 @@ jobs:
       - name: Build and test with Maven
         run: ./mvnw verify
         env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/table-reservations
-          SPRING_DATASOURCE_USERNAME: postgres
-          SPRING_DATASOURCE_PASSWORD: postgres
+          SPRING_PROFILES_ACTIVE: test
