@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -39,7 +41,7 @@ public class GlobalExceptionHandler {
         ApiError error = new ApiError(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Internal error in server",
-                LocalDateTime.now(),
+                OffsetDateTime.now(ZoneOffset.UTC),
                 MDC.get(CORRELATION_ID_KEY)
         );
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -49,7 +51,7 @@ public class GlobalExceptionHandler {
         ApiError error = new ApiError(
                 HttpStatus.BAD_REQUEST.value(),
                 message,
-                LocalDateTime.now(),
+                OffsetDateTime.now(ZoneOffset.UTC),
                 MDC.get(CORRELATION_ID_KEY)
         );
 
