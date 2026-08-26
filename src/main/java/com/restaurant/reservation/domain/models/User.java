@@ -1,5 +1,6 @@
 package com.restaurant.reservation.domain.models;
 
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +17,6 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "users",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = "username"),
                 @UniqueConstraint(columnNames = "email")
         })
 @Getter
@@ -27,8 +27,8 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 50)
-    private String username;
+    @Column(nullable = false, length = 100)
+    private String fullName;
 
     @Column(nullable = false, length = 100)
     private String email;
@@ -42,10 +42,16 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
-    public User(String username, String email, String password) {
-        this.username = username;
+    public User(String fullName, String email, String password) {
+        this.fullName = fullName;
         this.email = email;
         this.password = password;
+    }
+
+    @Override
+    @Nonnull
+    public String getUsername() {
+        return this.email;
     }
 
     @Override

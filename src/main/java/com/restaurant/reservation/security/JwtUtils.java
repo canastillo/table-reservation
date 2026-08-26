@@ -40,6 +40,16 @@ public class JwtUtils {
                 .compact();
     }
 
+    /**
+     * Extracts the subject from the JWT token.
+     * <p>
+     * Note: In this system the subject is the user's email, which serves as the
+     * unique identifier for authentication. Despite the method name using
+     * "username", the returned value is actually an email address.
+     *
+     * @param authToken the JWT token
+     * @return the email address stored as the subject claim
+     */
     public String getUsernameFromJwtToken(String authToken) {
         return Jwts.parser()
                 .verifyWith(key())
@@ -53,8 +63,8 @@ public class JwtUtils {
         try {
             Jwts.parser().verifyWith(key()).build().parseSignedClaims(authToken);
         } catch (Exception e) {
-            // TODO: log error (invalid signature, expired, malformed) con logger
-            return true;
+            // TODO: log error (invalid signature, expired, malformed) with logger
+            return false;
         }
 
         return true;

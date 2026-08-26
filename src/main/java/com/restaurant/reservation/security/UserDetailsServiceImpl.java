@@ -17,11 +17,23 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
-   @Override
-   @Transactional
-   @NonNull
-   public UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
-       return userRepository.findByUsername(username)
+    /**
+     * Loads a user by the identifier provided during authentication.
+     * <p>
+     * Although the parameter is named {@code username} to conform to the
+     * {@link UserDetailsService} interface, in this system the identifier is
+     * actually the user's email address. The method delegates to
+     * {@code userRepository.findByEmail(username)}.
+     *
+     * @param username the email address of the user to load
+     * @return the corresponding {@link UserDetails} instance
+     * @throws UsernameNotFoundException if no user exists with the given email
+     */
+    @Override
+    @Transactional
+    @NonNull
+    public UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
+        return userRepository.findByEmail(username)
                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
-   }
+    }
 }
