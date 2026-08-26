@@ -2,6 +2,7 @@ package com.restaurant.reservation.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -29,6 +30,15 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining(", "));
 
         return createBadRequestResponse(message);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiError> handleBadCredentials(BadCredentialsException ex) {
+        ApiError error = new ApiError(
+                HttpStatus.UNAUTHORIZED.value(),
+                "Invalid email or password"
+        );
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(Exception.class)
