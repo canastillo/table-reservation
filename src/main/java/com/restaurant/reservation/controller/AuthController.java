@@ -51,7 +51,7 @@ public class AuthController {
     public ResponseEntity<MessageResponse> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
             return ResponseEntity.badRequest()
-                    .body(new MessageResponse("Error: Email is already in use!"));
+                    .body(new MessageResponse("Error: Email is already in use"));
         }
 
         User user = new User(signUpRequest.getFullName(),
