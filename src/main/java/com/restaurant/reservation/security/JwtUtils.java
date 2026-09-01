@@ -1,7 +1,9 @@
 package com.restaurant.reservation.security;
 
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,14 +14,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Component
 public class JwtUtils {
 
-    @Value("${app.jwt.secret}")
-    private String jwtSecret;
+    private final String jwtSecret;
+    private final int jwtExpirationMs;
 
-    @Value("${app.jwt.expirationMs}")
-    private int jwtExpirationMs;
+    public JwtUtils(
+            @Value("${app.jwt.secret}") String jwtSecret,
+            @Value("${app.jwt.expirationMs}") int jwtExpirationMs
+        ) {
+        this.jwtSecret = jwtSecret;
+        this.jwtExpirationMs = jwtExpirationMs;
+    }
 
     private SecretKey key() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
@@ -62,8 +70,8 @@ public class JwtUtils {
     public boolean validateJwtToken(String authToken) {
         try {
             Jwts.parser().verifyWith(key()).build().parseSignedClaims(authToken);
-        } catch (Exception e) {
-            // TODO: log error (invalid signature, expired, malformed) with logger
+        } catch (JwtException | IllegalArgumentException ex) {
+            log.warn("Invalid JWT token: {}", ex.getMessage());
             return false;
         }
 
