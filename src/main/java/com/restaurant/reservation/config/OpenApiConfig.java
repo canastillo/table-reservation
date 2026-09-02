@@ -1,13 +1,18 @@
 package com.restaurant.reservation.config;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class OpenApiConfig {
+
+    private static final String SECURITY_SCHEME_NAME = "bearerAuth";
 
     @Bean
     public OpenAPI restaurantOpenAPI() {
@@ -15,10 +20,18 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Restaurant Reservation System API")
                         .description("API for table reservation management for restaurants.\n\n")
-                        .version("1.0.0")
+                        .version("0.2.0")
                         .contact(new Contact()
                                 .name("Ana Castillo")
                                 .url("https://github.com/canastillo/table-reservation")
-                                .email("canastillo_@outlook.com")));
+                                .email("canastillo_@outlook.com")))
+                .addSecurityItem(new SecurityRequirement().addList(SECURITY_SCHEME_NAME))
+                .components(new Components()
+                        .addSecuritySchemes(SECURITY_SCHEME_NAME,
+                                new SecurityScheme()
+                                        .name(SECURITY_SCHEME_NAME)
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")));
     }
 }
