@@ -1,15 +1,12 @@
 package com.restaurant.reservation.exception;
 
-import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -35,14 +32,21 @@ public class GlobalExceptionHandler {
         return createBadRequestResponse(message);
     }
 
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiError> handleBadCredentials(BadCredentialsException ex) {
+        ApiError error = new ApiError(
+                HttpStatus.UNAUTHORIZED.value(),
+                "Invalid email or password"
+        );
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleGeneral(Exception ex) {
         // TODO: Log actual error for internal debugging
         ApiError error = new ApiError(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal error in server",
-                OffsetDateTime.now(ZoneOffset.UTC),
-                MDC.get(CORRELATION_ID_KEY)
+                "Internal error in server"
         );
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -50,9 +54,7 @@ public class GlobalExceptionHandler {
     private ResponseEntity<ApiError> createBadRequestResponse(String message) {
         ApiError error = new ApiError(
                 HttpStatus.BAD_REQUEST.value(),
-                message,
-                OffsetDateTime.now(ZoneOffset.UTC),
-                MDC.get(CORRELATION_ID_KEY)
+                message
         );
 
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);

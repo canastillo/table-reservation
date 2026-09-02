@@ -10,3 +10,8 @@ spring:
       ddl-auto: create-drop
   web:
     locale: en
+
+app:
+  jwt:
+    secret: testSecretKeyForJwtSigningMustBeLongEnough123!
+    expirationMs: 60000 # 1 minute
