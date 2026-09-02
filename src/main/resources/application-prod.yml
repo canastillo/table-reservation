@@ -7,8 +7,3 @@ spring:
     hibernate:
       ddl-auto: validate # TODO: consider Flyway/Liquibase
     show-sql: false
-
-app:
-  jwt:
-    secret: ${JWT_SECRET}
-    expirationMs: ${JWT_EXPIRATION_MS:900000} # default set to 15 minutes
