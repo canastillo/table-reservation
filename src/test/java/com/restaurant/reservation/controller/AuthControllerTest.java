@@ -11,9 +11,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -54,17 +54,50 @@ class AuthControllerTest {
     }
 
     @Test
-    void registerUser_shouldReturnBadRequestWhenInvalidData() throws Exception {
+    void registerUser_shouldReturnBadRequestWhenEmptyFullName() throws Exception {
         SignUpRequest signup = new SignUpRequest();
         signup.setFullName("");
+        signup.setEmail("test@test.com");
+        signup.setPassword("123securePass");
+
+        mockMvc.perform(post("/api/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(signup)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.correlationId").isNotEmpty())
+                .andExpect(content().string(containsString("fullName: must not be blank")));
+    }
+
+    @Test
+    void registerUser_shouldReturnBadRequestWhenInvalidEmail() throws Exception {
+        SignUpRequest signup = new SignUpRequest();
+        signup.setFullName("Test user");
         signup.setEmail("invalid-email");
+        signup.setPassword("123securePass");
+
+        mockMvc.perform(post("/api/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(signup)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.correlationId").isNotEmpty())
+                .andExpect(jsonPath("$.message").value("email: must be a well-formed email address"));
+        ;
+    }
+
+    @Test
+    void registerUser_shouldReturnBadRequestWhenShortPassword() throws Exception {
+        SignUpRequest signup = new SignUpRequest();
+        signup.setFullName("Test user");
+        signup.setEmail("test@test.com");
         signup.setPassword("123");
 
         mockMvc.perform(post("/api/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(signup)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.correlationId").isNotEmpty());
+                .andExpect(jsonPath("$.correlationId").isNotEmpty())
+                .andExpect(jsonPath("$.message").value("password: size must be between 6 and 40"));
+        ;
     }
 
     @Test
