@@ -110,7 +110,7 @@ public class AuthController {
                     jwt,
                     "Bearer",
                     userDetails.getId(),
-                    userDetails.getUsername(),
+                    userDetails.getFullName(),
                     userDetails.getEmail(),
                     roles
             );

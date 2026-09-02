@@ -101,7 +101,7 @@ class AuthControllerTest {
     }
 
     @Test
-    void authenticateUser_shouldReturnJwtWithUserRole() throws Exception {
+    void authenticateUser_shouldReturnJwtAndRightUserData() throws Exception {
         LogInRequest login = new LogInRequest();
         login.setEmail("user@user.com");
         login.setPassword("user");
@@ -113,6 +113,7 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.token").isNotEmpty())
                 .andExpect(jsonPath("$.type").value("Bearer"))
                 .andExpect(jsonPath("$.email").value("user@user.com"))
+                .andExpect(jsonPath("$.fullName").value("User"))
                 .andExpect(jsonPath("$.roles[0]").value("ROLE_USER"));
     }
 
