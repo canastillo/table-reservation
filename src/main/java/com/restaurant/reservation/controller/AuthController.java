@@ -7,9 +7,15 @@ import com.restaurant.reservation.dto.JwtResponse;
 import com.restaurant.reservation.dto.LogInRequest;
 import com.restaurant.reservation.dto.MessageResponse;
 import com.restaurant.reservation.dto.SignUpRequest;
+import com.restaurant.reservation.exception.ApiError;
 import com.restaurant.reservation.repository.RoleRepository;
 import com.restaurant.reservation.repository.UserRepository;
 import com.restaurant.reservation.security.JwtUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +53,13 @@ public class AuthController {
         this.jwtUtils = jwtUtils;
     }
 
+    @Operation(summary = "Register user", description = "Creates user with ROLE_USER role")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User created successfully",
+                    content = @Content(schema = @Schema(implementation = MessageResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid data entry",
+                    content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @PostMapping("/signup")
     public ResponseEntity<MessageResponse> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
@@ -70,6 +83,13 @@ public class AuthController {
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 
+    @Operation(summary = "Log in", description = "Log in user and return JWT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User logged in successfully",
+                    content = @Content(schema = @Schema(implementation = MessageResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid credentials",
+                    content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @PostMapping("/signin")
     public ResponseEntity<JwtResponse> authenticateUser(@Valid @RequestBody LogInRequest loginRequest) {
         // GlobalExceptionHandler catches BadCredentialsException
