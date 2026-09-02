@@ -20,3 +20,7 @@ springdoc:
     path: /swagger-ui.html
     operationsSorter: method # order by http methods
     tagsSorter: alpha # order alphabetically
+
+app:
+  jwt:
+    expirationMs: 86400000   # 24 horas
