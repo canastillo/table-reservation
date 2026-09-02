@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -17,8 +18,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
-@AutoConfigureMockMvc(addFilters = false) // TODO: Delete after inmplementing JWT auth
+@AutoConfigureMockMvc()
 @ActiveProfiles("test")
+@WithMockUser(roles = "ADMIN")
 class TableControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -85,8 +87,8 @@ class TableControllerTest {
                         .contentType(String.valueOf(MediaType.APPLICATION_JSON))
                         .content(invalidJson))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("fixed: must be greater than or equal to 0"));
-                // .andExpect(jsonPath("$.correlationId").isNotEmpty()); TODO: when deleting addFilters = false, uncomment this line
+                .andExpect(jsonPath("$.message").value("fixed: must be greater than or equal to 0"))
+                .andExpect(jsonPath("$.correlationId").isNotEmpty());
     }
 
     @Test
