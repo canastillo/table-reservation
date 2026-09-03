@@ -23,7 +23,8 @@ class AuthControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
     void registerUser_shouldCreateUserAndReturnOk() throws Exception {

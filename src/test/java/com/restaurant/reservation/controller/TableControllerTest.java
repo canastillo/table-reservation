@@ -28,7 +28,8 @@ class TableControllerTest {
     @Autowired
     private TableRepository tableRepository;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private final String tablesURI = "/api/admin/tables";
 

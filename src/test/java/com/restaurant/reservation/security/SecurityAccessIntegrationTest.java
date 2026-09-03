@@ -20,13 +20,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 public class SecurityAccessIntegrationTest {
+
     @Autowired
     private MockMvc mockMvc;
 
-    //@Autowired
-    //private ObjectMapper objectMapper;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private String obtainToken(String email, String password) throws Exception {
         LogInRequest login = new LogInRequest();
