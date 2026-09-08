@@ -36,8 +36,12 @@ class ProdDataSeederTest {
     @Test
     void run_shouldCreateAdminWhenVariablesPresent() {
         ProdDataSeeder seeder = createSeeder("admin@example.com", "secret123", "Admin");
+        Role adminRole = new Role(RoleType.ROLE_ADMIN);
 
-        when(roleRepository.findByName(RoleType.ROLE_ADMIN)).thenReturn(Optional.empty());
+        when(roleRepository.findByName(RoleType.ROLE_ADMIN))
+                .thenReturn(Optional.empty())
+                .thenReturn(Optional.of(adminRole));
+
         when(roleRepository.findByName(RoleType.ROLE_USER)).thenReturn(Optional.empty());
         when(userRepository.existsByEmail("admin@example.com")).thenReturn(false);
         when(passwordEncoder.encode("secret123")).thenReturn("encoded");

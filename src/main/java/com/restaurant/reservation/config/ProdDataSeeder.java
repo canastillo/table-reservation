@@ -39,7 +39,7 @@ public class ProdDataSeeder implements CommandLineRunner {
         if (StringUtils.hasText(props.email()) && StringUtils.hasText(props.password())) {
             createAdminIfNotFound();
         } else {
-            throw new IllegalStateException("Admin credentials are required. Set DEMO_ADMIN_EMAIL and DEMO_ADMIN_PASSWORD");
+            throw new IllegalStateException("Admin credentials are required. Set ADMIN_EMAIL and ADMIN_PASSWORD");
         }
     }
 

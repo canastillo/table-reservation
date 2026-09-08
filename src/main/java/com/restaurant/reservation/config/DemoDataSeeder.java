@@ -44,7 +44,7 @@ public class DemoDataSeeder implements CommandLineRunner {
             createUserIfNotFound(props.admin().email(), props.admin().password(), RoleType.ROLE_ADMIN, "Demo Admin");
         } else {
             throw new IllegalStateException(
-                    "Admin credentials are required. Set ADMIN_EMAIL and ADMIN_PASSWORD environment variables."
+                    "Demo admin credentials are required. Set DEMO_ADMIN_EMAIL and DEMO_ADMIN_PASSWORD environment variables."
             );
         }
 

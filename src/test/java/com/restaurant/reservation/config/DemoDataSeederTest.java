@@ -80,19 +80,21 @@ class DemoDataSeederTest {
 
         assertThatThrownBy(() -> seeder.run((String) null))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("ADMIN_EMAIL and ADMIN_PASSWORD");
+                .hasMessageContaining("DEMO_ADMIN_EMAIL and DEMO_ADMIN_PASSWORD");
 
         verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
-    void run_shouldThrowWhenUserCredentialsMissing() {
+    void run_shouldNotThrowWhenUserCredentialsMissing() {
         DemoDataSeeder seeder = createSeeder("demo_admin@example.com", "demo123", "", "");
 
-        assertThatThrownBy(() -> seeder.run((String) null))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("USER_EMAIL and USER_PASSWORD");
+        when(roleRepository.findByName(RoleType.ROLE_ADMIN)).thenReturn(Optional.of(new Role(RoleType.ROLE_ADMIN)));
 
-        verify(userRepository, never()).save(any(User.class));
+        seeder.run((String) null);
+
+        verify(userRepository).existsByEmail("demo_admin@example.com");
+        verify(userRepository).save(any(User.class));
+        verifyNoMoreInteractions(userRepository);
     }
 }
