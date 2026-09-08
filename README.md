@@ -21,6 +21,7 @@ Backend project developed with **Java 17**, **Spring Boot 4.0** and **PostgreSQL
 - Docker / Docker Compose
 - Spring Security
 - JJWT (Java JWT)
+- JaCoCo
 
 ## 🚀 How to run locally
 ### Prerequisites
@@ -47,18 +48,31 @@ The API will be listening at `http://localhost:8080`.
 
 Unit and integration tests use an in-memory H2 database and do not require PostgreSQL.
 
-## 📚 API Documentation
-Once the application is running, you can access:
+## Spring Profiles
+The application defines four distinct profiles, each with a clear purpose:
 
+| Profile |	Intended environment  | 	Description                                                                                                                                                  |
+| --- | --- |---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| dev |	Local development | 	PostgreSQL via Docker, ddl-auto=create-drop, seeded with fixed test users.                                                                                   |
+| test  | CI and integration tests  | In-memory H2 database, isolated data, same seeded users as dev.                                                                                               |
+| prod  | Production  | 	External PostgreSQL, schema validation, all sensitive values injected via environment variables. No default credentials.                                     |
+| demo  | Public sandbox (Railway)  | Mirrors production configuration but is seeded with well-known, intentionally weak credentials that are safe to share publicly, so visitors can test the API. |
+
+## 📚 API Documentation
+When running locally, you can access:
 - **Swagger UI:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 - **OpenAPI specification (JSON):** [http://localhost:8080/api-docs](http://localhost:8080/api-docs)
+
+The live demo Swagger UI can be accessed through:
+
+> Note: For the prod profile, Swagger UI and OpenAPI specification are disabled. These are enable in the demo profile only for portfolio showcase purposes.
 
 ### Available endpoints
 
 | Method | Endpoint | Description | Permissions |
 | --- | --- | --- | --- |
-| `POST` | `/api/tables/initialize` | Initializes restaurant tables | ADMIN (pending) |
-| `GET` | `/api/tables` | Gets the current table configuration | ADMIN (pending) |
+| `POST` | `/api/tables/initialize` | Initializes restaurant tables | ADMIN |
+| `GET` | `/api/tables` | Gets the current table configuration | ADMIN |
 | `POST` | `/api/auth/signup` | Registers a new user with ROLE_USER role | Public |
 | `POST` | `/api/auth/signin` | Log in and returns a JWT | Public |
 
@@ -66,14 +80,22 @@ Once the application is running, you can access:
 
 The API uses JWT Bearer tokens. To authenticate:
 
-1. Use `POST /api/auth/signin` with seeded credentials or sign up first.
+1. Use `POST /api/auth/signin` with seeded credentials (below these instructions) or sign up first.
+![log-in.png](images/log-in.png)
 2. Copy the returned token from the response.
-3. In Swagger UI, click **Authorize** and paste `Bearer <token>`.
-4. Now you can access protected endpoints.
+![token-in-response.jpg](images/token-in-response.jpg)
+3. In Swagger UI, click **Authorize** button (green button at the top right corner right above the paths), this will open a modal.
+![authorize-button.jpg](images/authorize-button.jpg)
+4. Paste the token without the quotes, then hit "Authorize".
+![paste-token.jpg](images/paste-token.jpg)
+5. You can now close the modal and access protected endpoints.
 
 For development and test profiles, two users get created:
 - admin@admin.com / admin (ROLE_ADMIN)
 - user@user.com / user (ROLE_USER)
+
+For live demo, available credentials are:
+- admin@demo.com / adminadmin
 
 ## 📦 CI/CD
 

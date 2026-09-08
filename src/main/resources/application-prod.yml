@@ -17,3 +17,9 @@ app:
       email: ${ADMIN_EMAIL:}
       password: ${ADMIN_PASSWORD:}
       fullName: ${ADMIN_FULL_NAME:}
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
