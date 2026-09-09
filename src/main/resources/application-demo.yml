@@ -14,6 +14,8 @@ app:
     expirationMs: ${JWT_EXPIRATION_MS:900000}
   bootstrap:
     admin:
-      username: demo_admin
-      password: demo123
-      email: demo_admin@example.com
+      email: ${DEMO_ADMIN_EMAIL:}
+      password: ${DEMO_ADMIN_PASSWORD:}
+    user:
+      email: ${DEMO_USER_EMAIL:}
+      password: ${DEMO_USER_PASSWORD:}

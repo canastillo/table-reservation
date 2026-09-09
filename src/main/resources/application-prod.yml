@@ -12,3 +12,14 @@ app:
   jwt:
     secret: ${JWT_SECRET}
     expirationMs: ${JWT_EXPIRATION_MS:900000} # default set to 15 minutes
+  bootstrap:
+    admin:
+      email: ${ADMIN_EMAIL:}
+      password: ${ADMIN_PASSWORD:}
+      fullName: ${ADMIN_FULL_NAME:}
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
